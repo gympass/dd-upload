@@ -1,0 +1,37 @@
+name: 'DD Upload'
+description: 'Uploads sourcemaps to DataDog'
+branding:
+  icon: 'cloud'
+  color: 'gray-dark'
+inputs:
+  image:
+    description: 'Name of the image from where to acquire sourcemaps. Optional if ecr-deploy is used.'
+    required: false
+  application-name:
+    description: 'Application name'
+    required: false
+  application-version:
+    description: 'Application version. Optional if ecr-deploy is used.'
+    required: false
+  sourcemaps-path:
+    description: 'Path to the sourcemaps directory inside the image'
+    required: true
+  minified-path-prefix:
+    description: 'This argument is relayed directly to datadog-ci'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: "Run dd-upload"
+      id: build
+      shell: bash
+      run: |
+        set -eux
+        entrypoint='/gympass/dd-upload'
+        cmd=("$entrypoint")
+        if [ -n '${{ inputs.image }}' ]; then cmd+=(--image ${{ inputs.image }}); fi
+        if [ -n '${{ inputs.application-name }}' ]; then cmd+=(--service-name ${{ inputs.application-name }}); fi
+        if [ -n '${{ inputs.application-version }}' ]; then cmd+=(--release-version ${{ inputs.application-version }}); fi
+        if [ -n '${{ inputs.sourcemaps-path }}' ]; then cmd+=(--sources-path ${{ inputs.sourcemaps-path }}); fi
+        if [ -n '${{ inputs.minified-path-prefix }}' ]; then cmd+=(--minified-path-prefix ${{ inputs.minified-path-prefix }}); fi
+        "${cmd[@]}"
