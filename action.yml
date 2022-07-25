@@ -19,6 +19,10 @@ inputs:
   minified-path-prefix:
     description: 'This argument is relayed directly to datadog-ci'
     required: true
+  working-directory:
+    description: 'Path where the application was build on.'
+    required: false
+
 runs:
   using: "composite"
   steps:
@@ -34,4 +38,5 @@ runs:
         if [ -n '${{ inputs.application-version }}' ]; then cmd+=(--release-version ${{ inputs.application-version }}); fi
         if [ -n '${{ inputs.sourcemaps-path }}' ]; then cmd+=(--sources-path ${{ inputs.sourcemaps-path }}); fi
         if [ -n '${{ inputs.minified-path-prefix }}' ]; then cmd+=(--minified-path-prefix ${{ inputs.minified-path-prefix }}); fi
+        if [ -n '${{ inputs.working-directory }}' ]; then cmd+=(--workdir ${{ inputs.working-directory }}); fi
         "${cmd[@]}"
